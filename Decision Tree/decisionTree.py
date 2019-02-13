@@ -23,7 +23,7 @@ class decisionTree:
 
     def __init__(self, attributes, bina):
         """ this takes int # of attributes,
-            boolean value if tree labels are binary
+            boolean value if tree labels are discrete
         """ 
         self.attr = attributes
         self.depth = 0
@@ -119,14 +119,18 @@ class decisionTree:
                 for atrib in self.attributes.keys():
                     if temp[0][anum] != atrib:
                         gain[atrib] = 0
+                        if self.type == 'Gini':
+                            gain[atrib] = 1
                         #if attribute has not been used to split
                         for val in self.attributes[atrib]:
                             counter = dict()
                             denom = 0
                             for ll in self.labels:
                                 counter[ll] = 0
-        
+
+                            #for each example atr in data 
                             for atr in temp:
+                                #if attribute value in this example
                                 if val in atr[anum]:
                                     counter[atr[len(atr)-1]] += 1
                                     denom += 1
@@ -135,8 +139,14 @@ class decisionTree:
                             for a in counter.keys():
                                 if counter[a] != 0:
                                     #just for id3
-                                    if
-                                    gain[atrib] += ((counter[a])/s) * ( -((counter[a]/denom) * math.log((counter[a]/denom),2))) 
+                                    if self.type == 'ID3':
+                                        gain[atrib] += ((counter[a])/s) * ( -((counter[a]/denom) * math.log((counter[a]/denom),2))) 
+                                    if self.type == 'Gini':
+                                        gain[atrib] -= math.pow((counter[a]/s), 2)
+                                    if self.type == 'ME':
+                                        gain[atrib] += 1
+                            if self.type == 'Gini':
+                                gain[atrib] = gain[atrib] * (denom/s)
                         
                     anum +=1
                 #find best attribute to split
@@ -164,7 +174,7 @@ class decisionTree:
                             mod[find] = best
                             newdata.append(mod)
 
-                    nd.childs[val] = self.make_id3(depth-1, newdata)
+                    nd.childs[val] = self.make_t(depth-1, newdata)
                 return nd
 
     

@@ -25,5 +25,8 @@ tree.add_training(train5)
 tree.add_training(train6)
 tree.add_training(train7)
 tree.add_labels('0,1')
-tree.make_tree('ID3', -1)
-a = 2
+tree.make_tree('Gini', -1)
+
+a = 2 #to have breakpoint to see tree structure in nodes
+
+tree2 = decisionTree.decisionTree(4, True)
