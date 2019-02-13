@@ -1,15 +1,14 @@
+import math
+
 class node:
     """ This class handles the nodes in a decision tree
     """
 
     def __init__(self, attr):
         self.attribute = attr
-        self.childs = []  
+        self.childs = dict()  
         self.leaf = False
         self.label = '' 
-
-    def add_childs(self, child):
-        self.childs.append(child)
 
     def is_leaf(self):
         self.leaf = True
@@ -22,33 +21,41 @@ class decisionTree:
     """ this class makes and uses the decision tree
     """
 
-    def __init__(self, attributes, dep, bina):
-        """ this takes int # of attributes, int max depth of the tree (<zero if no limit),
+    def __init__(self, attributes, bina):
+        """ this takes int # of attributes,
             boolean value if tree labels are binary
         """ 
         self.attr = attributes
-        self.depth = dep
+        self.depth = 0
         self.type = ''
         self.binary = bina
         self.training = []
         self.start = node('temp')
         self.attributes = dict()
+        self.labels = []
 
     def add_training(self, train):
         """ takes a training string of the format attribute1, atr2, . . .to finally the label last all seperated by commas
         """
-        self.training.append(train)
+        trainlist = [x.strip() for x in train.split(',')]
+        self.training.append(trainlist)
 
     def add_attribute(self, input):
         """ add attributes in the format
-            attribute, val1, val2, . . . until all values are in
+            attribute, val1, val2, . . . until all values are in and attributes are added in order they are listed in data
         """
         atr = [x.strip() for x in input.split(',')]
 
         #add all attrubutes and values to the dictionary
-        self.attributes[atr[0]] = atr[1]
+        self.attributes[atr[0]] = [atr[1]]
         for current in range(2, len(atr)):
             self.attributes[atr[0]].append(atr[current])
+
+    def add_labels(self, lab):
+        """ add labels in a string seperated by ,
+        """
+        labs = [x.strip() for x in lab.split(',')]
+        self.labels.append(labs)
 
     def run(self, input):
         """ runs the input on the built tree
@@ -58,29 +65,142 @@ class decisionTree:
         current = self.start
 
         while len(test) > 0:
-            rem = ''
-            ll = False
-            for one in test:
-                if one in self.attributes:
-                    #correct attribute chosen at level
-                    current = self.attributes[one]
-                    rem = one
-                    ll = current.leaf
-                    break
-            
-            test.remove(rem)
-            #leaf node reached
-            if ll == True:
+            if current.leaf:
                 return current.label
+            else:
+                return 1
+                #TODO!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-        return current.label
 
-    def make_tree(self, ty):
-        """make the tree with the type of 'ID3', 'gini', or 'ME'
-        """
-        #compute information gain for each attribute
+    def make_id3(self, depth, data):
+        if depth == 0:
+            #find majoriy label
+            counter = dict()
+            for ex in data:
+                label = ex[len(ex)-1]
+                if label not in counter.keys():
+                    counter[label] = 1
+                else:
+                    counter[label] += 1
+            #find highest
+            most = counter.keys()[0]
+            for victim in counter.keys():
+                if counter[victim] > counter[most]:
+                    most = victim
+            #make leaf with most common label
+            leaf = node('leaf')
+            leaf.is_leaf()
+            leaf.set_label(most)
+            return leaf
 
+        #depth is not zero
+        else:
+            #check if labels are the same
+            prev = data[0][len(data[0])-1]
+            same = True
+            for victim in data:
+                if prev != victim[len(victim)-1]:
+                    same = False
+                    break
+            #if all same label then make leaf
+            if same:
+                leaf = node('leaf')
+                leaf.is_leaf()
+                leaf.set_label(prev)
+                return leaf
+
+            #not all same so calculate gain 
+            else:
+                temp = data
+                #looking for lowest value in gain
+                gain = dict()
+                anum = 0
+                for atrib in self.attributes.keys():
+                    if temp[0][anum] != atrib:
+                        gain[atrib] = 0
+                        #if attribute has not been used to split
+                        for val in self.attributes[atrib]:
+                            pos = 0
+                            neg = 0
+                            for atr in temp:
+                                if val in atr[anum]:
+                                    if atr[len(atr)-1] == '1':
+                                        pos += 1
+                                    else:
+                                        neg += 1
+                                        
+                            s = len(data)
+                            pp = pos/(pos+neg)
+                            pn = neg/(pos+neg)
+                            
+                            if pp > 0 and pn > 0:
+                                gain[atrib] += ((pos+neg)/s) * ( -(pp * math.log(pp,2)) - (pn * math.log(pn,2)) )
+                            elif pp > 0:
+                                gain[atrib] += ((pos)/s) * ( -(pp * math.log(pp,2)))
+                            else:
+                                gain[atrib] += ((neg)/s) * ( -(pn * math.log(pn,2)))
+                        
+                    anum +=1
+                #find best attribute to split
+                best = list(gain.keys())[0]
+                for attribute in gain.keys():
+                    if gain[attribute] < gain[best]:
+                        best = attribute 
+                
+                #split on best
+                nd = node(best)
+                nd.set_label('split')
+                find = list(self.attributes)
+                for x in range(0, len(find)):
+                    if find[x] == best:
+                        find = x
+                        break
+
+                for val in self.attributes[best]:
+                    newdata = []
+                    for test in data:
+                        if val in test[find]:
+                            mod = []
+                            for x in test:
+                                mod.append(x)
+                            mod[find] = best
+                            newdata.append(mod)
+
+                    nd.childs[val] = self.make_id3(depth-1, newdata)
+                return nd
+
+
+                                        
+
+
+ 
+
+    def __make_gini(self, depth, data):
+        if depth == 0:
+            #make leaf node with majority label
+            leaf = node()
+
+    def __make_me(self, depth, data):
+        if depth == 0:
+            #make leaf node with majority label
+            leaf = node()
     
 
+    def make_tree(self, ty, dep):
+        """ make the tree with the type of 'ID3', 'Gini', or 'ME',
+            int max depth of the tree (zero < if no limit)
+        """
+        #compute information gain for each attribute
+        self.depth = dep
 
-    def __
+        if ty == 'ID3':
+            self.start = self.make_id3(dep, self.training)
+        if ty == 'Gini':
+            self.start = __make_gini(dep, self.training)
+        if ty == 'ME':
+            self.start = __make_me(dep, self.training)
+        if ty != 'ID3' and ty != 'Gini' and ty != 'ME':
+            print("use 'ID3', 'Gini', or 'ME' for type of tree in second argument")
+
+
+    
