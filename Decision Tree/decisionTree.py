@@ -55,7 +55,8 @@ class decisionTree:
         """ add labels in a string seperated by ,
         """
         labs = [x.strip() for x in lab.split(',')]
-        self.labels.append(labs)
+        for one in labs:
+            self.labels.append(one)
 
     def run(self, input):
         """ runs the input on the built tree
@@ -72,7 +73,7 @@ class decisionTree:
                 #TODO!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 
-    def make_id3(self, depth, data):
+    def make_t(self, depth, data):
         if depth == 0:
             #find majoriy label
             counter = dict()
@@ -120,25 +121,22 @@ class decisionTree:
                         gain[atrib] = 0
                         #if attribute has not been used to split
                         for val in self.attributes[atrib]:
-                            pos = 0
-                            neg = 0
+                            counter = dict()
+                            denom = 0
+                            for ll in self.labels:
+                                counter[ll] = 0
+        
                             for atr in temp:
                                 if val in atr[anum]:
-                                    if atr[len(atr)-1] == '1':
-                                        pos += 1
-                                    else:
-                                        neg += 1
+                                    counter[atr[len(atr)-1]] += 1
+                                    denom += 1
                                         
                             s = len(data)
-                            pp = pos/(pos+neg)
-                            pn = neg/(pos+neg)
-                            
-                            if pp > 0 and pn > 0:
-                                gain[atrib] += ((pos+neg)/s) * ( -(pp * math.log(pp,2)) - (pn * math.log(pn,2)) )
-                            elif pp > 0:
-                                gain[atrib] += ((pos)/s) * ( -(pp * math.log(pp,2)))
-                            else:
-                                gain[atrib] += ((neg)/s) * ( -(pn * math.log(pn,2)))
+                            for a in counter.keys():
+                                if counter[a] != 0:
+                                    #just for id3
+                                    if
+                                    gain[atrib] += ((counter[a])/s) * ( -((counter[a]/denom) * math.log((counter[a]/denom),2))) 
                         
                     anum +=1
                 #find best attribute to split
@@ -169,21 +167,6 @@ class decisionTree:
                     nd.childs[val] = self.make_id3(depth-1, newdata)
                 return nd
 
-
-                                        
-
-
- 
-
-    def __make_gini(self, depth, data):
-        if depth == 0:
-            #make leaf node with majority label
-            leaf = node()
-
-    def __make_me(self, depth, data):
-        if depth == 0:
-            #make leaf node with majority label
-            leaf = node()
     
 
     def make_tree(self, ty, dep):
@@ -193,14 +176,11 @@ class decisionTree:
         #compute information gain for each attribute
         self.depth = dep
 
-        if ty == 'ID3':
-            self.start = self.make_id3(dep, self.training)
-        if ty == 'Gini':
-            self.start = __make_gini(dep, self.training)
-        if ty == 'ME':
-            self.start = __make_me(dep, self.training)
         if ty != 'ID3' and ty != 'Gini' and ty != 'ME':
             print("use 'ID3', 'Gini', or 'ME' for type of tree in second argument")
+        else:
+            self.type = ty
+            self.start = self.make_t(dep, self.training)
 
 
     
