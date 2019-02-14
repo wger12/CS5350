@@ -119,34 +119,48 @@ class decisionTree:
                 for atrib in self.attributes.keys():
                     if temp[0][anum] != atrib:
                         gain[atrib] = 0
+
                         if self.type == 'Gini':
                             gain[atrib] = 1
+
+                        mecounter = dict()
                         #if attribute has not been used to split
                         for val in self.attributes[atrib]:
                             counter = dict()
                             denom = 0
+            
                             for ll in self.labels:
                                 counter[ll] = 0
+                                mecounter[ll] = 0 
 
                             #for each example atr in data 
                             for atr in temp:
                                 #if attribute value in this example
                                 if val in atr[anum]:
                                     counter[atr[len(atr)-1]] += 1
+                                    mecounter[atr[len(atr)-1]] += 1
                                     denom += 1
                                         
                             s = len(data)
                             for a in counter.keys():
                                 if counter[a] != 0:
-                                    #just for id3
+                                    #calculate the gain for different types
                                     if self.type == 'ID3':
                                         gain[atrib] += ((counter[a])/s) * ( -((counter[a]/denom) * math.log((counter[a]/denom),2))) 
                                     if self.type == 'Gini':
                                         gain[atrib] -= math.pow((counter[a]/s), 2)
-                                    if self.type == 'ME':
-                                        gain[atrib] += 1
+
                             if self.type == 'Gini':
                                 gain[atrib] = gain[atrib] * (denom/s)
+                            #special for majority error
+                            if self.type == 'ME':
+                                best = list(mecounter.keys())[0]
+                                for me in mecounter.keys():
+                                    if (mecounter[best]/s) < (mecounter[me]/s):
+                                        best = me
+                                gain[atrib] = (s- mecounter[best])/s
+                            
+
                         
                     anum +=1
                 #find best attribute to split

@@ -25,7 +25,7 @@ tree.add_training(train5)
 tree.add_training(train6)
 tree.add_training(train7)
 tree.add_labels('0,1')
-tree.make_tree('Gini', -1)
+tree.make_tree('ME', -1)
 
 a = 2 #to have breakpoint to see tree structure in nodes
 
