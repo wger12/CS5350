@@ -1,5 +1,10 @@
 import decisionTree
 
+testfile = 'car_test.csv'
+trainfile = 'car_train.csv'
+
+
+#test 
 atr1 = 'x1, 0, 1'
 atr2 = 'x2, 0, 1'
 atr3 = 'x3, 0, 1'
@@ -27,6 +32,48 @@ tree.add_training(train7)
 tree.add_labels('0,1')
 tree.make_tree('ME', -1)
 
-a = 2 #to have breakpoint to see tree structure in nodes
-
+#cars
 tree2 = decisionTree.decisionTree(4, True)
+tree2.add_attribute('buying, vhigh, high, med, low')
+tree2.add_attribute('maint, vhigh, high, med, low')
+tree2.add_attribute('doors, 2, 3, 4, 5more')
+tree2.add_attribute('persons, 2, 4, more')
+tree2.add_attribute('lug_boot, small, med, big')
+tree2.add_attribute('safety, low, med, high')
+tree2.add_labels('unacc, acc, good, vgood')
+#get data from training file
+f = open(trainfile, 'r')
+for line in f:
+    tree2.add_training(line)
+f.close()
+
+#find training error
+tests = ['ID3', 'Gini', 'ME']
+for test in tests:
+    for size in range(1, 7):
+        count = 0
+        correct = 0
+        print('Tree type: ' + test + ' size: ' + str(size))
+        tree2.make_tree(test, size)
+        f = open(testfile, 'r')
+        for trial in f:
+            right = trial.split(',')
+            right = right[len(right)-1].strip()
+            answer = tree2.run(trial)
+            if answer == right:
+                correct += 1
+            count += 1
+        print('error' + str(1 - (correct/count)))
+        
+        f.close()
+        f = open(trainfile, 'r')
+        for trial in f:
+            right = trial.split(',')
+            right = right[len(right)-1].strip()
+            answer = tree2.run(trial)
+            if answer == right:
+                correct += 1
+            count += 1
+        f.close()
+
+        print('error' + str(1 - (correct/count)))

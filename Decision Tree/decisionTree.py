@@ -42,7 +42,8 @@ class decisionTree:
 
     def add_attribute(self, input):
         """ add attributes in the format
-            attribute, val1, val2, . . . until all values are in and attributes are added in order they are listed in data
+            attribute name, val1, val2, . . . until all values are in and attributes are added 
+            MUST BE ADDED IN SAME ORDER AS TRAINING AND TESTS
         """
         atr = [x.strip() for x in input.split(',')]
 
@@ -69,8 +70,14 @@ class decisionTree:
             if current.leaf:
                 return current.label
             else:
-                return 1
-                #TODO!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+                atrindex = list(self.attributes.keys())
+                index = atrindex.index(current.attribute)
+                #move to next node
+                current = current.childs[test[index]]
+                #change data in test to better debug
+                test[index] = current.attribute
+
+                
 
 
     def make_t(self, depth, data):
@@ -84,8 +91,14 @@ class decisionTree:
                 else:
                     counter[label] += 1
             #find highest
-            most = counter.keys()[0]
-            for victim in counter.keys():
+            most = list(counter.keys())[0]
+            if len(most) == 0:
+                leaf = node('leaf')
+                leaf.is_leaf()
+                leaf.set_label('error')
+                return leaf
+
+            for victim in list(counter.keys()):
                 if counter[victim] > counter[most]:
                     most = victim
             #make leaf with most common label
@@ -187,8 +200,26 @@ class decisionTree:
                                 mod.append(x)
                             mod[find] = best
                             newdata.append(mod)
-
-                    nd.childs[val] = self.make_t(depth-1, newdata)
+                    #make leaf with majority label
+                    if len(newdata) == 0:
+                        cc = dict()
+                        for a in self.labels:
+                            cc[a] = 0
+                        for ex in data:
+                            label = ex[len(ex)-1]
+                            cc[label] += 1
+                        labellist = list(cc.keys())
+                        mm = labellist[0]
+                        for lab in labellist:
+                            if cc[lab] > cc[mm]:
+                                mm = lab
+                        leaf = node('leaf')
+                        leaf.is_leaf()
+                        leaf.set_label(mm)
+                        return leaf
+                        
+                    else:
+                        nd.childs[val] = self.make_t(depth-1, newdata)
                 return nd
 
     
@@ -201,9 +232,10 @@ class decisionTree:
         self.depth = dep
 
         if ty != 'ID3' and ty != 'Gini' and ty != 'ME':
-            print("use 'ID3', 'Gini', or 'ME' for type of tree in second argument")
+            print("use 'ID3', 'Gini', or 'ME' for type of tree in first argument")
         else:
             self.type = ty
+            self.start = ''
             self.start = self.make_t(dep, self.training)
 
 
