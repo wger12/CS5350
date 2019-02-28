@@ -30,7 +30,7 @@ tree.add_training(train5)
 tree.add_training(train6)
 tree.add_training(train7)
 tree.add_labels('0,1')
-tree.make_tree('ME', -1)
+tree.make_tree('ME', 1)
 
 #cars
 tree2 = decisionTree.decisionTree(4, True)

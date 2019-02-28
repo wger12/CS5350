@@ -226,7 +226,7 @@ class decisionTree:
 
     def make_tree(self, ty, dep):
         """ make the tree with the type of 'ID3', 'Gini', or 'ME',
-            int max depth of the tree (zero < if no limit)
+            int max depth of the tree (< zero if no limit)
         """
         #compute information gain for each attribute
         self.depth = dep
