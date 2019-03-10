@@ -8,7 +8,7 @@ class perceptron:
         self.ee = 0
         self.training = []
         self.attribs = attributes
-        self.weight = numpy.zeros(attributes)
+        self.weight = [0] *attributes
         self.vote = False
 
 
@@ -26,7 +26,7 @@ class perceptron:
         """
         self.rate = learning_rate
         self.ee = epochs
-        self.weight = numpy.zeros(self.attribs)
+        self.weight = [0] * self.attribs
         self.vote = False
 
         for round in range(self.ee):
@@ -59,9 +59,10 @@ class perceptron:
         """
         self.rate = learning_rate
         self.ee = epochs
-        self.weight = numpy.zeros(self.attribs)
+        self.weight = [0] * self.attribs
         self.vote = True
         vote = 1
+        #holds tuples (ci, weight)
         totals = []
 
         for round in range(self.ee):
@@ -91,6 +92,7 @@ class perceptron:
 
                 else:
                     vote += 1
+        self.weight = totals
 
     
 
@@ -139,12 +141,14 @@ class perceptron:
             the test should have the attributes seperated by comma and optional label last
             returns 0 for negative and 1 for positive
         """
+        tt = [x.strip() for x in test.split(',')]
+        tt = list(map(float,tt))
+
         #if the label is on the test
         if len(test) > self.attribs:
-            tt = [x.strip() for x in test.split(',')]
-            tt = list(map(float,tt))
-            label = tt.pop(len(tt)-1)
-
+            tt.pop(len(tt)-1)
+        
+        if self.vote == False:
             guess = numpy.inner(tt, self.weight)
             pred = int(numpy.sign(guess))
 
@@ -152,4 +156,24 @@ class perceptron:
                 return 0
             else:
                 return 1
-    
+                
+        #special case for voting perceptron    
+        else:
+            total = 0
+            for x in self.weight:
+                # get votes and weights
+                c = x[0]
+                w = x[1]
+                guess = numpy.inner(tt, w)
+                pred = int(numpy.sign(guess))
+                total += (c * pred)
+            
+            #final sign
+            final = numpy.sign(total)
+            if final < 0:
+                return 0
+            else:
+                return 1
+                
+                    
+

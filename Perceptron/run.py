@@ -31,13 +31,14 @@ error = 0
 for test in testing:
     tt = [x.strip() for x in test.split(',')]
     ans = tt[len(tt)-1]
+    ans = int(ans)
 
     guess = one.run(test)
     if ans != guess:
         error += 1
     count += 1
 
-print('regular error: ' + str(error/count))
+print('regular error: ' + str(float(error/count)))
 
 #average
 one.make_average(1, 10)
@@ -47,6 +48,7 @@ error = 0
 for test in testing:
     tt = [x.strip() for x in test.split(',')]
     ans = tt[len(tt)-1]
+    ans = int(ans)
 
     guess = one.run(test)
     if ans != guess:
@@ -63,6 +65,7 @@ error = 0
 for test in testing:
     tt = [x.strip() for x in test.split(',')]
     ans = tt[len(tt)-1]
+    ans = int(ans)
 
     guess = one.run(test)
     if ans != guess:
