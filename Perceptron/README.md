@@ -1,1 +1,2 @@
-Will contain Perceptron implementation
+Perceptron implementation
+This wil only support binary labels
