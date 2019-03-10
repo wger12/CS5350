@@ -17,6 +17,7 @@ class perceptron:
             assuming the attributes are continuous values
         """
         add = [x.strip() for x in train.split(',')]
+        add = list(map(float,add))
         self.training.append(add)
     
 
@@ -33,6 +34,8 @@ class perceptron:
                 #remove the label fro the training
                 victim = list.copy(victim)
                 ans = victim.pop(len(victim)-1)
+                ans = int(ans)
+                
                 ans = int(numpy.sign(ans))
 
                 pred = numpy.inner(victim,self.weight)
@@ -43,9 +46,9 @@ class perceptron:
                     neww = [i * self.rate for i in victim]
                     www = []
                     for x in range(self.attribs):
-                        if(ans > 0):
+                        if(ans == 1):
                             www.append(neww[x] + self.weight[x])
-                        if(ans < 0):
+                        else:
                             www.append(neww[x] - self.weight[x])
 
                     self.weight = www
@@ -76,9 +79,9 @@ class perceptron:
                     neww = [i * self.rate for i in victim]
                     www = []
                     for x in range(self.attribs):
-                        if(ans > 0):
+                        if(ans == 1):
                             www.append(neww[x] + self.weight[x])
-                        if(ans < 0):
+                        else:
                             www.append(neww[x] - self.weight[x])
 
                     self.weight = www
@@ -96,9 +99,9 @@ class perceptron:
         """
         self.rate = learning_rate
         self.ee = epochs
-        self.weight = numpy.zeros(self.attribs)
+        self.weight = [0] * self.attribs
         self.vote = False
-        average = list.copy(self.weight)
+        average = [0] * self.attribs
 
         for round in range(self.ee):
             for victim in self.training:
@@ -116,9 +119,9 @@ class perceptron:
                     www = []
                     #make new weight
                     for x in range(self.attribs):
-                        if(ans > 0):
+                        if(ans == 1):
                             www.append(neww[x] + self.weight[x])
-                        if(ans < 0):
+                        else:
                             www.append(neww[x] - self.weight[x])
 
                     self.weight = www
@@ -138,11 +141,12 @@ class perceptron:
         """
         #if the label is on the test
         if len(test) > self.attribs:
-            test = list.copy(test)
-            label = test.pop(len(test)-1)
+            tt = [x.strip() for x in test.split(',')]
+            tt = list(map(float,tt))
+            label = tt.pop(len(tt)-1)
 
-            pred = numpy.inner(test, self.weight)
-            pred = int(numpy.sign(pred))
+            guess = numpy.inner(tt, self.weight)
+            pred = int(numpy.sign(guess))
 
             if pred < 0:
                 return 0
