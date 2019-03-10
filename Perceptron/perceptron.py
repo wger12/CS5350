@@ -153,9 +153,9 @@ class perceptron:
             pred = int(numpy.sign(guess))
 
             if pred < 0:
-                return 0
-            else:
                 return 1
+            else:
+                return 0
                 
         #special case for voting perceptron    
         else:
@@ -171,9 +171,9 @@ class perceptron:
             #final sign
             final = numpy.sign(total)
             if final < 0:
-                return 0
-            else:
                 return 1
+            else:
+                return 0
                 
                     
 

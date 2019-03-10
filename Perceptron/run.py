@@ -39,6 +39,7 @@ for test in testing:
     count += 1
 
 print('regular error: ' + str(float(error/count)))
+print('weight: ' + str(one.weight))
 
 #average
 one.make_average(1, 10)
@@ -56,6 +57,7 @@ for test in testing:
     count += 1
 
 print('average error: ' + str(error/count))
+print('weight: ' + str(one.weight))
 
 #voting
 one.make_vote(1, 10)
@@ -73,3 +75,6 @@ for test in testing:
     count += 1
 
 print('voting error: ' + str(error/count))
+for x in one.weight:
+    if x[0] > 3:
+        print(x)
