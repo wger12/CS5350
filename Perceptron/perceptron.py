@@ -37,8 +37,9 @@ class perceptron:
                 ans = int(ans)
                 
                 ans = int(numpy.sign(ans))
-
-                pred = numpy.inner(victim,self.weight)
+                x =  numpy.array(victim)
+                w = numpy.array(self.weight)
+                pred = w.T @ x
                 pred = int(numpy.sign(pred))
 
                 #incorrect and update
@@ -72,7 +73,7 @@ class perceptron:
                 ans = victim.pop(len(victim)-1)
                 ans = int(numpy.sign(ans))
 
-                pred = numpy.inner(victim,self.weight)
+                pred = numpy.array(self.weight).T @ numpy.array(victim)
                 pred = int(numpy.sign(pred))
 
                 #incorrect and update
@@ -112,7 +113,7 @@ class perceptron:
                 ans = victim.pop(len(victim)-1)
                 ans = int(numpy.sign(ans))
 
-                pred = numpy.inner(victim,self.weight)
+                pred = numpy.array(self.weight).T @ numpy.array(victim)
                 pred = int(numpy.sign(pred))
 
                 #incorrect and update
@@ -149,7 +150,7 @@ class perceptron:
             tt.pop(len(tt)-1)
         
         if self.vote == False:
-            guess = numpy.inner(tt, self.weight)
+            guess = numpy.array(self.weight).T @ numpy.array(tt)
             pred = int(numpy.sign(guess))
 
             if pred < 0:
@@ -164,7 +165,7 @@ class perceptron:
                 # get votes and weights
                 c = x[0]
                 w = x[1]
-                guess = numpy.inner(tt, w)
+                guess = numpy.array(w).T @ numpy.array(tt)
                 pred = int(numpy.sign(guess))
                 total += (c * pred)
             
